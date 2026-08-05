@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-credit-card text-primary me-2"></i>Checkout & Delivery Details</h3>
+
+    <form method="post" action="{{ url_for('products.place_order') }}">
+        <div class="row g-4">
+            <!-- Shipping Information -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm p-4 p-md-5 mb-4">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-truck-fast me-2 text-primary"></i>Delivery Address</h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="full_name" required value="{{ current_user.name }}" placeholder="Recipient Name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" name="phone" required value="{{ current_user.phone or '' }}" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Street / House Address <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="address_line" required placeholder="Flat, Street, Area">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">City <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="city" required placeholder="City">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">State / UT <span class="text-danger">*</span></label>
+                            <select class="form-select" name="state" required>
+                                <option value="">Select State</option>
+                                {% for st in india_states %}
+                                    <option value="{{ st }}" {% if current_user.location and st in current_user.location %}selected{% endif %}>{{ st }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">PIN Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="pincode" required placeholder="6-digit PIN">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3"><i class="fa-solid fa-wallet me-2 text-primary"></i>Payment Method</h5>
+                    <div class="form-check p-3 border rounded bg-light mb-2">
+                        <input class="form-check-input ms-1 me-2" type="radio" name="payment_method" id="cod" value="cod" checked>
+                        <label class="form-check-label fw-bold text-dark" for="cod">
+                            <i class="fa-solid fa-money-bill-wave text-success me-1"></i> Cash on Delivery / Pay on Inspection
+                        </label>
+                        <small class="d-block text-muted ms-4">Pay directly when you meet seller or receive item.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm p-4">
+                    <h5 class="fw-bold mb-3">Items in Order</h5>
+                    <div class="list-group list-group-flush mb-3">
+                        {% for item in items %}
+                            <div class="list-group-item px-0 py-3 bg-transparent d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if item.product and item.product.image %}
+                                        <img src="{{ url_for('static', filename=item.product.image) if not item.product.image.startswith('http') else item.product.image }}" class="rounded-3" style="width: 48px; height: 48px; object-fit: cover;">
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="mb-0 fw-bold small text-dark">{{ item.product.title if item.product else 'Item' }}</h6>
+                                        <small class="text-muted">Seller: {{ item.product.owner.name if item.product and item.product.owner else 'Unknown' }}</small>
+                                    </div>
+                                </div>
+                                <div class="fw-bold text-dark">₹{{ "%.2f"|format(item.product.price if item.product else 0) }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong class="fs-5">Total Payable</strong>
+                        <strong class="fs-5 text-primary">₹{{ "%.2f"|format(subtotal) }}</strong>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark btn-lg w-100 py-3">
+                        <i class="fa-solid fa-circle-check me-2"></i>Place Order Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

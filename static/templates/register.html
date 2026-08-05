@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-8 col-md-10">
+        <div class="card form-card border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Create Your Account</h3>
+                    <p class="text-muted small">Join thousands of local buyers and sellers across India.</p>
+                </div>
+
+                <form method="post" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-regular fa-user text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" name="name" required value="{{ name or '' }}" placeholder="John Doe">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-regular fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control border-start-0" name="email" required value="{{ email or '' }}" placeholder="you@example.com">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">State / UT</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-location-dot text-muted"></i></span>
+                            <select class="form-select border-start-0" name="location">
+                                <option value="">Select your state</option>
+                                {% for state in india_states %}
+                                    <option value="{{ state }}" {% if location == state %}selected{% endif %}>{{ state }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                            <input type="tel" class="form-control border-start-0" name="phone" value="{{ phone or '' }}" placeholder="+91 98765 43210">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0" name="password" required placeholder="Min 6 characters">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-shield-halved text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0" name="confirm_password" required placeholder="Repeat password">
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-dark btn-lg w-100 py-3">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Create Account
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

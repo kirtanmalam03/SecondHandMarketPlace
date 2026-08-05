@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <h3 class="fw-bold mb-4"><i class="fa-solid fa-box-open text-primary me-2"></i>My Orders & Purchases</h3>
+
+    {% if orders %}
+        <div class="row g-4">
+            {% for order in orders %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <div class="card-header bg-light py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <div>
+                                <span class="fw-bold text-dark">Order #{{ order.id }}</span>
+                                <span class="text-muted small ms-2"><i class="fa-regular fa-clock me-1"></i>Placed on {{ order.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary px-3 py-2 rounded-pill font-heading">STATUS: {{ order.status.upper() }}</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-3">Ordered Items</h6>
+                                    <div class="d-flex flex-column gap-2">
+                                        {% for item in order.items %}
+                                            <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded-3">
+                                                <div>
+                                                    <strong class="text-dark">{{ item.title_snapshot }}</strong>
+                                                    <span class="small text-muted d-block">Unit Price: ₹{{ "%.2f"|format(item.unit_price) }}</span>
+                                                </div>
+                                                <div class="fw-bold text-dark">₹{{ "%.2f"|format(item.unit_price * item.quantity) }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end border-start pt-3 pt-md-0 mt-3 mt-md-0">
+                                    <span class="text-muted small d-block">TOTAL AMOUNT</span>
+                                    <div class="display-6 fw-bold text-primary mb-3">₹{{ "%.2f"|format(order.total_amount) }}</div>
+
+                                    {% if order.delivery %}
+                                        <div class="small text-muted">
+                                            <div><i class="fa-solid fa-location-dot me-1 text-primary"></i>Deliver to: <strong>{{ order.delivery.full_name }}</strong></div>
+                                            <div>{{ order.delivery.address_line }}, {{ order.delivery.city }}</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card border-0 shadow-sm p-5 text-center my-4">
+            <div class="brand-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                <i class="fa-solid fa-receipt"></i>
+            </div>
+            <h4 class="fw-bold">No Orders Placed Yet</h4>
+            <p class="text-muted small mb-4">You haven't purchased any items on SecondHand Hub yet.</p>
+            <div>
+                <a href="{{ url_for('products.home') }}" class="btn btn-dark btn-lg px-4">Start Shopping</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

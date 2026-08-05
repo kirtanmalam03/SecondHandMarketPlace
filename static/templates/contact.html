@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-7 col-md-9">
+        <div class="card form-card border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Get in Touch</h3>
+                    <p class="text-muted small">Have questions, feedback, or need help? Send us a message.</p>
+                </div>
+
+                <form method="post" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Your Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required value="{{ current_user.name if current_user.is_authenticated else '' }}" placeholder="Name">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" name="email" required value="{{ current_user.email if current_user.is_authenticated else '' }}" placeholder="Email">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Message / Inquiry <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="message" rows="5" required placeholder="How can we help you?"></textarea>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-dark btn-lg w-100 py-3">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

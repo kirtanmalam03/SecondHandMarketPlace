@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-6 col-md-8">
+        <div class="card form-card border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-user-pen"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Edit Profile</h3>
+                    <p class="text-muted small">Update your public name, location, and contact information.</p>
+                </div>
+
+                <form method="post" class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required value="{{ current_user.name }}" placeholder="Your Name">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">State / UT Location</label>
+                        <select class="form-select" name="location">
+                            <option value="">Select State</option>
+                            {% for st in india_states %}
+                                <option value="{{ st }}" {% if current_user.location and st in current_user.location %}selected{% endif %}>{{ st }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" name="phone" value="{{ current_user.phone or '' }}" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-dark btn-lg w-100 py-3">
+                            <i class="fa-solid fa-check me-2"></i>Save Updated Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

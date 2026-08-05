@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Chat with {{ other_user.name if other_user else 'User' }} - SecondHand Hub{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="mb-3">
+        <a href="{{ url_for('chat.inbox') }}" class="btn btn-outline-dark btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Inbox
+        </a>
+    </div>
+
+    {% if error %}
+        <div class="alert alert-warning soft-alert shadow-sm">{{ error }}</div>
+    {% else %}
+        <div class="chat-shell">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="chat-user-avatar">
+                        {{ other_user.name[0].upper() }}
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">{{ other_user.name }}</h6>
+                        <small class="text-muted d-flex align-items-center gap-1">
+                            <span class="pulse-online"></span> Online & Active
+                        </small>
+                    </div>
+                </div>
+                <div class="text-muted small">
+                    <i class="fa-solid fa-shield-halved text-primary me-1"></i> Verified Local Chat
+                </div>
+            </div>
+
+            <!-- Messages Stream -->
+            <div class="messages-container" id="messagesList">
+                {% for msg in messages %}
+                    <div class="message {% if msg.sender_id == current_user.id %}sent{% else %}received{% endif %}" id="msg-{{ msg.id }}">
+                        <div class="bubble">
+                            <div class="text">{{ msg.message }}</div>
+                            <div class="d-flex justify-content-between align-items-center gap-2 mt-1">
+                                <span class="time opacity-75">{{ msg.timestamp.strftime('%I:%M %p') }}</span>
+                                {% if msg.sender_id == current_user.id %}
+                                    <form method="post" action="{{ url_for('chat.delete_message', message_id=msg.id) }}" class="d-inline">
+                                        <button type="submit" class="message-delete-btn text-white-50" title="Delete message"><i class="fa-solid fa-xmark"></i></button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Typing indicator -->
+            <div class="px-3 py-1 bg-white text-muted small" id="typingIndicator" style="display: none;">
+                <i class="fa-solid fa-pen fa-bounce me-1 text-primary"></i> <span id="typingText">User is typing...</span>
+            </div>
+
+            <!-- Input bar -->
+            <div class="chat-input-area">
+                <form id="chatForm" class="d-flex gap-2">
+                    <input type="text" id="messageInput" class="form-control" placeholder="Type a message to {{ other_user.name }}..." autocomplete="off" required>
+                    <button type="submit" class="btn btn-dark px-4">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const socket = io();
+    const roomName = "{{ room }}";
+    const currentUserId = {{ current_user.id }};
+    const otherUserId = {{ other_user.id if other_user else 0 }};
+    const messagesList = document.getElementById("messagesList");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+    const typingIndicator = document.getElementById("typingIndicator");
+
+    if (!roomName) return;
+
+    // Join room
+    socket.emit("join_room", { room: roomName });
+
+    // Scroll to bottom
+    messagesList.scrollTop = messagesList.scrollHeight;
+
+    // Send Message
+    chatForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const text = messageInput.value.trim();
+        if (!text) return;
+
+        socket.emit("send_message", {
+            room: roomName,
+            receiver_id: otherUserId,
+            message: text
+        });
+
+        messageInput.value = "";
+    });
+
+    // Receive Message
+    socket.on("receive_message", function (data) {
+        const isSelf = data.sender_id === currentUserId;
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${isSelf ? "sent" : "received"}`;
+        msgDiv.innerHTML = `
+            <div class="bubble">
+                <div class="text">${escapeHtml(data.message)}</div>
+                <div class="d-flex justify-content-between align-items-center gap-2 mt-1">
+                    <span class="time opacity-75">${data.timestamp}</span>
+                </div>
+            </div>
+        `;
+        messagesList.appendChild(msgDiv);
+        messagesList.scrollTop = messagesList.scrollHeight;
+    });
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
+{% endblock %}
